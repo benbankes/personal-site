@@ -1,0 +1,22 @@
+---
+
+- name: ensure web packages are installed
+  yum: name={{item}} state=latest
+  with_items:
+    - gpg
+    - supervisor
+  notify: restart supervisor
+
+- name: install the ruby version manager ansible role
+  command: ansible-galaxy install rvm_io.rvm1-ruby creates=/etc/ansible/roles/rvm_io.rvm1-ruby
+
+- name: install ruby version manager
+  command: ansible-playbook -i /var/www/html/{{hostname}}/ansible/hosts /var/www/html/{{hostname}}/ansible/ruby-version-manager.yml creates=/usr/local/rvm
+
+# For some reason, the gem module does not function as expected & possibly as desired
+- name: ensure jekyll ruby gem and direct/indirect dependencies are installed
+  command: gem install {{item}}
+  with_items:
+    - jekyll
+    - execjs
+    - therubyracer

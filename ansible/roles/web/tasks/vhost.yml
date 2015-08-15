@@ -1,0 +1,5 @@
+---
+
+- name: add virtual hosts
+  template: src=vhost.j2 dest=/etc/httpd/conf.d/{{hostname}}.conf backup=yes
+  notify: restart apache

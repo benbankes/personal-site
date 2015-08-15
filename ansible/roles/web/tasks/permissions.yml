@@ -1,0 +1,4 @@
+---
+
+- name: set permissions of application web root
+  file: path=/var/www/html/{{hostname}} state=directory owner={{linux_username}} group=apache recurse=yes

@@ -1,0 +1,8 @@
+---
+
+- name: create jekyll site if it doesn't exist
+  command: jekyll new /var/www/html/{{hostname}}/jekyll creates=/var/www/html/{{hostname}}/jekyll
+
+- name: create jekyll configs
+  template: src=_config.yml.j2 dest=/var/www/html/{{hostname}}/jekyll/_config.yml backup=yes
+  notify: restart supervisor

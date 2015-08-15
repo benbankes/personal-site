@@ -1,0 +1,14 @@
+---
+
+ # Copy this file to the same directory with the filename "all"
+is_production: "0" # Production configuration runs when is_production is "1"
+prod_hostname: pencilinthehand.com
+dev_hostname: dev.{{prod_hostname}}
+hostname: "{{prod_hostname if is_production == '1' else dev_hostname}}"
+linux_username: sbn
+index_folder: jekyll/_site
+
+ # These are not used by the playbook for a development deployment
+ # Password hashes can be created with openssl passwd -1 <plaintext_pw>
+linux_passhash: $1$0qJSJKQq$9WJIK1O57Qj1z4dG0yJnp0 # xidEcdJdhU (needs changing)
+bu_passhash: $1$NtizpEf6$JMa.e4JfdTz/y1VLCFuQG/ # Password hash for backup (bu) user HBTbQT3F4w (needs changing)

@@ -1,0 +1,7 @@
+---
+
+- name: install ruby versoin manager role from ansible-galaxy
+  hosts: webservers
+
+  roles:
+    - { role: rvm_io.rvm1-ruby, tags: ruby }

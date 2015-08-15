@@ -1,0 +1,28 @@
+---
+
+- name: get jekyll binary location
+  command: which jekyll
+  register: jekyll_bin
+
+# http://stackoverflow.com/questions/26247926/how-to-solve-usr-bin-env-ruby-executable-hooks-no-such-file-or-directory
+- name: add jekyll command
+  ini_file: dest=/etc/supervisord.conf section=program:{{hostname}}_jekyll option=command value="{{jekyll_bin.stdout | regex_replace('\/bin\/', '\/wrappers\/')}} build --source /var/www/html/{{hostname}}/jekyll --destination /var/www/html/{{hostname}}/jekyll/_site --watch --config /var/www/html/{{hostname}}/jekyll/_config.yml" backup=yes
+  notify: restart supervisor
+
+- name: add jekyll user
+  ini_file: dest=/etc/supervisord.conf section=program:{{hostname}}_jekyll option=user value={{linux_username}} backup=yes
+  notify: restart supervisor
+
+- name: ensure supervisor log folder exists
+  file: path=/var/log/{{hostname}}_jekyll state=directory
+
+- name: add jekyll standard out log file
+  ini_file: dest=/etc/supervisord.conf section=program:{{hostname}}_jekyll option=stdout_logfile value=/var/log/{{hostname}}_jekyll/out.log backup=yes
+  notify: restart supervisor
+
+- name: add jekyll standard error log file
+  ini_file: dest=/etc/supervisord.conf section=program:{{hostname}}_jekyll option=stderr_logfile value=/var/log/{{hostname}}_jekyll/err.log backup=yes
+  notify: restart supervisor
+
+- name: enable and start supervisor service
+  service: name=supervisord enabled=yes state=started

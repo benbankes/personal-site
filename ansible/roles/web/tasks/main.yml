@@ -1,0 +1,11 @@
+---
+
+- include: packages.yml
+- include: jekyll.yml
+- include: apache.yml
+- include: firewall.yml
+- include: dns.yml
+- include: permissions.yml
+- include: supervisor.yml
+  when: is_production == "0"
+- include: vhost.yml

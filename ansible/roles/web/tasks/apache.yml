@@ -1,0 +1,24 @@
+---
+
+- name: ensure apache is installed
+  yum: name=httpd state=latest
+
+- name: enable and start apache service
+  service: name=httpd enabled=yes state=started
+
+- name: enable keep-alive
+  lineinfile: dest=/etc/httpd/conf/httpd.conf regexp="^KeepAlive On" line="KeepAlive On" state=present backup=yes
+  notify: restart apache
+
+- name: enable gzip compression
+  lineinfile: dest=/etc/httpd/conf/httpd.conf regexp="^SetOutputFilter DEFLATE" line="SetOutputFilter DEFLATE" state=present backup=yes
+  notify: restart apache
+
+- name: create web root for application
+  file: path=/var/www/html/{{hostname}} state=directory owner={{linux_username}} group=apache
+  notify: restart apache
+
+- name: set server name
+  lineinfile: dest=/etc/httpd/conf/httpd.conf regexp=^#?ServerName line="ServerName {{hostname}}" backup=yes
+  when: is_production == "1"
+  notify: restart apache

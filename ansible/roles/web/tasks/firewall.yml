@@ -1,0 +1,15 @@
+---
+
+- name: ensure firewalld is installed
+  yum: name=firewalld state=latest
+
+- name: enable and start firewall service
+  service: name=firewalld enabled=yes state=started
+
+- name: allow http port on firewall
+  firewalld: service=http permanent=true state=enabled
+  notify: restart firewall
+
+- name: allow https port on firewall
+  firewalld: service=https permanent=true state=enabled
+  notify: restart firewall

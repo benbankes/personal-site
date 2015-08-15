@@ -1,0 +1,36 @@
+---
+# This playbook contains common plays that will be run on all nodes.
+
+- name: ensure linux user bu exists with password
+  user: name=bu password={{bu_passhash}}
+  when: is_production == "1"
+
+- name: ensure linux user exists
+  user: name={{linux_username}}
+  
+- name: ensure linux user has password
+  user: name={{linux_username}} password={{linux_passhash}}
+  when: is_production == "1"
+
+- name: upgrade all packages
+  yum: name=* state=latest
+
+- name: ensure common packages are installed
+  yum: name={{item}} state=latest
+  with_items:
+    - git
+    - vim
+    - wget
+    - telnet
+    - expect
+    - libselinux-python
+
+- name: ensure selinux is disabled
+  selinux: state=disabled
+
+- name: set selinux runtime to permissive
+  command: setenforce 0
+  ignore_errors: yes
+
+- include: fail2ban.yml
+  when: is_production == "1"

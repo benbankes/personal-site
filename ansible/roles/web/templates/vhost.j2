@@ -1,0 +1,8 @@
+<VirtualHost *:80>
+    ServerName www.{{hostname}}
+    Redirect permanent / http://{{hostname}}/
+</VirtualHost>
+<VirtualHost *:80>
+    ServerName {{hostname}}
+	DocumentRoot /var/www/html/{{hostname}}/{{index_folder}}
+</VirtualHost>

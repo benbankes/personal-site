@@ -1,0 +1,8 @@
+---
+
+- name: add hostname
+  hostname: name={{hostname}}
+  when: is_production == "1"
+
+- name: add static, local dns entry for hostname
+  lineinfile: dest=/etc/hosts regexp=".*{{hostname}}" line="127.0.0.1 {{hostname}}" state=present backup=yes
