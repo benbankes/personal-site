@@ -53,6 +53,7 @@ The playbook contains instructions for the following tasks:
 	
 	- The `linux_username` is the user that will be given ownership of the web files
 	- Typically the user will already exist as the primary desktop user
+	- Leave all other defaults unchanged
 
 6. Run the ansible playbook
 
