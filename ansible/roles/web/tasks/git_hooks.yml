@@ -1,0 +1,4 @@
+---
+
+- name: add client-side git hooks
+  template: src=git_hooks/pre-push.j2 dest=/var/www/html/{{hostname}}/.git/hooks/pre-push owner={{linux_username}} group={{linux_username}} mode=u+rwx,g+rx,o+rx backup=yes

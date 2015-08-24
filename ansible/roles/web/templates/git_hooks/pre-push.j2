@@ -1,0 +1,76 @@
+#!/bin/sh
+
+# A hook script to verify what is about to be pushed.  Called by "git
+# push" after it has checked the remote status, but before anything has been
+# pushed.  If this script exits with a non-zero status nothing will be pushed.
+#
+# This hook is called with the following parameters:
+#
+# $1 -- Name of the remote to which the push is being done
+# $2 -- URL to which the push is being done
+#
+# If pushing without using a named remote those arguments will be equal.
+#
+# Information about the commits which are being pushed is supplied as lines to
+# the standard input in the form:
+#
+#   <local ref> <local sha1> <remote ref> <remote sha1>
+
+remote="$1"
+url="$2"
+
+z40=0000000000000000000000000000000000000000
+
+IFS=' '
+while read local_ref local_sha remote_ref remote_sha
+do
+	if [ "$local_sha" = $z40 ]
+	then
+		operation="delete"
+	else
+		if [ "$remote_sha" = $z40 ]
+		then
+			operation="create"
+			range="$local_sha"
+		else
+			operation="update"
+			range="$remote_sha..$local_sha"
+		fi
+	fi
+
+	last_local_ref=$local_ref
+done
+
+# Do the following on the last commit read
+
+if [ $operation = "create" ] && [[ $last_local_ref =~ refs/tags/.* ]]
+then
+	current_commit=$(git rev-parse HEAD)
+	tag_name=$(echo $last_local_ref | cut -d'/' -f 3)
+	tagged_commit=$(git rev-list $tag_name | head -n 1)
+	current_user_aws_access_key_id=$(aws configure get aws_access_key_id)
+	git_status=$(git status --porcelain)
+	
+	if [ $current_commit != $tagged_commit ]
+	then
+		echo "The latest tag must be the current HEAD to deploy"
+		exit 1
+	fi
+
+	if ! [ $current_user_aws_access_key_id ]
+	then
+		echo "The current user does not have an AWS configuration"
+		exit 1
+	fi
+
+	if ! [ -z $git_status ]
+	then
+		# Working directory is dirty
+		echo "The working directory must be clean to deploy code"
+		exit 1
+	fi
+
+	aws s3 sync /var/www/html/{{hostname}}/jekyll/_site s3://s3.{{prod_hostname}}
+fi
+
+exit 0

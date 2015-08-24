@@ -9,3 +9,5 @@
 - include: supervisor.yml
   when: is_production == "0"
 - include: vhost.yml
+- include: git_hooks.yml
+  when: is_production == "0"
